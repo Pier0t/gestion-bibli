@@ -1,6 +1,5 @@
 import { GoogleBooksResponse, Book } from '@/types/Book';
-
-const GOOGLE_BOOKS_API_BASE = 'https://www.googleapis.com/books/v1/volumes';
+import { GOOGLE_BOOKS_API_BASE } from './config';
 
 export class GoogleBooksApi {
   static async searchByISBN(isbn: string): Promise<Book | null> {

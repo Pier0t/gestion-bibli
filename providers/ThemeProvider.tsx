@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useColorScheme } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
 
 interface ThemeColors {
   primary: string;
@@ -53,14 +54,24 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const systemColorScheme = useColorScheme();
-  const [isDark, setIsDark] = useState(systemColorScheme === 'dark');
+  const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
-    setIsDark(systemColorScheme === 'dark');
+    const loadPreference = async () => {
+      const stored = await SecureStore.getItemAsync('theme-preference');
+      if (stored === null) {
+        setIsDark(systemColorScheme === 'dark');
+      } else {
+        setIsDark(stored === 'dark');
+      }
+    };
+    loadPreference();
   }, [systemColorScheme]);
 
-  const toggleTheme = () => {
-    setIsDark(!isDark);
+  const toggleTheme = async () => {
+    const value = !isDark;
+    setIsDark(value);
+    await SecureStore.setItemAsync('theme-preference', value ? 'dark' : 'light');
   };
 
   const colors = isDark ? darkColors : lightColors;
